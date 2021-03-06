@@ -15,18 +15,19 @@ import * as routes from "../../constants/routes";
 import {useHistory} from "react-router-dom";
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import {makeStyles} from '@material-ui/core/styles';
-import {loginInWithEmailAndPassword, signUpWithEmailAndPassword} from "../../service/firebase/auth";
+import {getAuthToken, loginInWithEmailAndPassword, signUpWithEmailAndPassword} from "../../service/firebase/auth";
 import {userAuthenticationAction} from "../../redux/actions/authenticate";
 import {createUserDocument} from "../../service/firebase/firebase";
 import {RenderTextField} from '../common/fields/RenderTextField';
 import Image from '../../assets/background-img.svg';
+
 interface IFormInputs {
     emailId: string,
     password: string,
     displayName: string
 }
 
-const AuthenticateUser : React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs>> = (props: any) => {
+const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs>> = (props: any) => {
     const {handleSubmit} = props;
     const [isUserSigningUp, setUserSigningUp] = useState(false);
     const useStyles = makeStyles((theme) => ({
@@ -74,33 +75,36 @@ const AuthenticateUser : React.FC<IFormInputs & InjectedFormProps<{}, IFormInput
     };
 
     const onSubmit = async (data: IFormInputs) => {
-       // e.preventDefault();
-       console.log('data', data);
+        console.log('data', data);
+        debugger;
         const {emailId, password, displayName} = data;
         if (isUserSigningUp) {
             try {
                 const {user} = await signUpWithEmailAndPassword(emailId, password);
                 const data = await createUserDocument(user, {displayName});
-                dispatch(userAuthenticationAction(data));
+                const token = await getAuthToken();
+                dispatch(userAuthenticationAction({data, token}));
                 history.push(routes.NOTES);
                 return data;
             } catch (error) {
-                console.log('error', error);
+                console.log(error)
             }
         } else {
             if (emailId && password) {
                 try {
                     const {user} = await loginInWithEmailAndPassword(emailId, password);
                     const data = await createUserDocument(user);
-                    dispatch(userAuthenticationAction(data));
+                    const token = await getAuthToken();
+                    dispatch(userAuthenticationAction({data, token}));
                     history.push(routes.NOTES);
                     return data;
                 } catch (error) {
-                    console.log('error logging in', error);
+                    console.log(error)
                 }
             }
         }
     };
+
     const handleToggler = () => {
         setUserSigningUp(!isUserSigningUp)
     };
@@ -129,9 +133,9 @@ const AuthenticateUser : React.FC<IFormInputs & InjectedFormProps<{}, IFormInput
                     <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
                         {isUserSigningUp ?
                             <Field name="displayName"
-                                  component={RenderTextField}
-                                  placeholder="Full Name"
-                                  label="Full Name"/> : null}
+                                   component={RenderTextField}
+                                   placeholder="Full Name"
+                                   label="Full Name"/> : null}
                         {/*<TextField
                             variant="outlined"
                             margin="normal"
