@@ -15,6 +15,9 @@ import Sidebar from "../sidebar/Sidebar";
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import {logOut} from "../../../service/firebase/auth";
+import {userAuthenticationAction} from "../../../redux/actions/authenticate";
+import {useDispatch} from "react-redux";
 
 const drawerWidth = 240;
 
@@ -89,6 +92,7 @@ const Header = () => {
     const [open, setOpen] = React.useState(false);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const openList = Boolean(anchorEl);
+    const dispatch = useDispatch();
 
     const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -104,6 +108,11 @@ const Header = () => {
 
     const handleDrawerClose = () => {
         setOpen(false);
+    };
+
+    const handleLogOut = async () => {
+        await logOut();
+        dispatch(userAuthenticationAction({}))
     };
 
     return (
@@ -154,7 +163,7 @@ const Header = () => {
                             open={openList}
                             onClose={handleClose}
                         >
-                            <MenuItem onClick={handleClose}>Logout</MenuItem>
+                            <MenuItem onClick={handleLogOut}>Logout</MenuItem>
                         </Menu>
                     </div>
                 </Toolbar>
