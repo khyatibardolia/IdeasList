@@ -42,13 +42,13 @@ const Sidebar = (props: any) => {
         }
     }, [dispatch]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         console.log('useEffectttttttttttt')
         const fetchApi = async () => {
             await getNote(notes && notes[0]?.id)
         }
         fetchApi();
-    }, [notes, getNote]);
+    }, [notes, getNote]);*/
 
     const addNote = (e:any) => {
         console.log('add note called')

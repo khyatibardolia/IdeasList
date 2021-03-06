@@ -3,7 +3,6 @@ const initialState = {
 };
 
 export const authReducer = (state = initialState, action: any) => {
-    console.log('paylod', action.payload)
     switch (action.type) {
         case "AUTHENTICATE_USER":
             return {

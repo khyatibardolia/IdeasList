@@ -27,6 +27,7 @@ interface IFormInputs {
     displayName: string
 }
 
+
 const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs>> = (props: any) => {
     const {handleSubmit} = props;
     const [isUserSigningUp, setUserSigningUp] = useState(false);
@@ -83,6 +84,9 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                 const {user} = await signUpWithEmailAndPassword(emailId, password);
                 const data = await createUserDocument(user, {displayName});
                 const token = await getAuthToken();
+                if(token) {
+                    localStorage.setItem('token', token);
+                }
                 dispatch(userAuthenticationAction({data, token}));
                 history.push(routes.NOTES);
                 return data;
@@ -95,6 +99,10 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                     const {user} = await loginInWithEmailAndPassword(emailId, password);
                     const data = await createUserDocument(user);
                     const token = await getAuthToken();
+                    if(token) {
+                        localStorage.setItem('token', token);
+                    }
+
                     dispatch(userAuthenticationAction({data, token}));
                     history.push(routes.NOTES);
                     return data;
@@ -136,32 +144,6 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                                    component={RenderTextField}
                                    placeholder="Full Name"
                                    label="Full Name"/> : null}
-                        {/*<TextField
-                            variant="outlined"
-                            margin="normal"
-                            fullWidth
-                            id="email"
-                            onChange={(e) => handleChange(e)}
-                            label="Email Address"
-                            name="emailId"
-                            autoComplete="email"
-                            ref={register}
-                            autoFocus
-                        />
-
-                        <TextField
-                            variant="outlined"
-                            margin="normal"
-                            fullWidth
-                            onChange={(e) => handleChange(e)}
-                            name="password"
-                            label="Password"
-                            ref={register}
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                        />*/}
-
                         <Field name="emailId"
                                component={RenderTextField}
                                placeholder="Email Address"

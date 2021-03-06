@@ -3,18 +3,18 @@ import React, {useEffect, useState} from "react";
 import TreeNode from "./TreeNode";
 import {addNoteDocument} from "../../../service/firebase/firebase";
 import {useDispatch} from "react-redux";
-import {addNoteAction} from "../../../redux/actions/notes";
-import {useHistory} from "react-router";
 
 const AddEditNote = () => {
-
     const [nodes, setNodes] = useState([]);
-    const history = useHistory();
+    useEffect(() => {
+        addRootElement()
+    }, []);
 
-    const initializedNodes = (nodes: any, location?: any):any => {
+    const initializedNodes = (nodes: any, location?: any): any => {
         const nodesCopy = [];
+        console.log('initializedNodes', nodes)
         for (let i = 0; i < nodes.length; i++) {
-            const { children, title } = nodes[i];
+            const {children, title} = nodes[i];
             const hasChildren = children !== undefined;
             const id = location ? `${location}.${i + 1}` : `${i + 1}`;
             nodesCopy[i] = {
@@ -29,7 +29,6 @@ const AddEditNote = () => {
         console.log('nodesCopy', nodesCopy)
         return nodesCopy;
     }
-
     const changeTitle = (id: any) => {
         return (newTitle: any) => {
             id = id.split(".").map((str: any) => parseInt(str));
@@ -57,43 +56,47 @@ const AddEditNote = () => {
             id,
             title: "",
         };
-        setNodes((prevState) => ({
-            ...prevState, newNode
-        }));
+        setNodes((prev: any): any => {
+            return [...prev, newNode];
+        })
     };
 
     const addChild = (id: any) => {
         return () => {
+            console.log('add child called', id);
+            console.log('addChild nodes initial state', nodes);
             id = id.split(".").map((str: any) => parseInt(str));
             const allNodes = initializedNodes(nodes);
-            let changingNode = allNodes[id[0] - 1];
+            let changingNode = allNodes && allNodes[id[0] - 1];
 
+            console.log('changingNode', changingNode)
             if (id.length > 1) {
                 for (let i = 1; i < id.length; i++) {
-                    changingNode = changingNode.children[id[i] - 1];
+                    changingNode = changingNode && changingNode.children[id[i] - 1];
                 }
             }
 
-            if (changingNode.children === undefined) {
+            if (changingNode && changingNode.children === undefined) {
                 changingNode.children = [];
             }
 
-            id = `${id.join(".")}.${changingNode.children.length + 1}`;
+            id = `${id.join(".")}.${changingNode?.children?.length + 1}`;
 
-            changingNode.children = [
-                ...changingNode.children,
-                {
-                    children: undefined,
-                    changeTitle: changeTitle(id),
-                    removeNode: removeNode(id),
-                    addChild: addChild(id),
-                    id,
-                    title: "",
-                }];
-
-            setNodes(allNodes)
+            if (changingNode) {
+                changingNode.children = [
+                    ...changingNode.children,
+                    {
+                        children: undefined,
+                        changeTitle: changeTitle(id),
+                        removeNode: removeNode(id),
+                        addChild: addChild(id),
+                        id,
+                        title: "",
+                    }];
+                setNodes(allNodes)
+            }
         }
-    }
+    };
 
     const removeNode = (id: any) => {
         return () => {
@@ -109,7 +112,7 @@ const AddEditNote = () => {
                 setNodes(() => initializedNodes(newNodes));
 
             } else {
-                let changingNode:any = nodes[id[0] - 1];
+                let changingNode: any = nodes[id[0] - 1];
 
                 for (let i = 2; i < id.length; i++) {
                     changingNode = changingNode.children[id[i - 1] - 1];
@@ -126,10 +129,10 @@ const AddEditNote = () => {
             }
         }
     };
-    const simplify = (nodes: any):any => {
+    const simplify = (nodes: any): any => {
         const nodesCopy = [];
         for (let i = 0; i < nodes.length; i++) {
-            const { children, title } = nodes[i];
+            const {children, title} = nodes[i];
             const hasChildren = children !== undefined && children.length > 0;
             nodesCopy[i] = {
                 title,
@@ -140,34 +143,62 @@ const AddEditNote = () => {
         return nodesCopy;
     }
 
-    const {location: {state}} = history;
-    const addRootNode = state;
-    console.log('state', state);
-    const fetchData = async () => {
-        const data = await(addNoteDocument([{title: ''}]));
-        dispatch(addNoteAction(data))
-        //addRootElement()
-    }
-    if(addRootNode !== '') {
-        //fetchData()
-    }
     const dispatch = useDispatch();
-    useEffect(() => {
-        console.log('add page useeffect called')
 
-    }, []);
+     const DEFAULT_NODES = [
+        {
+            "title": "Tea",
+            "children": [
+                {
+                    "title": "Black",
+                    "children": [
+                        {
+                            "title": "Assam"
+                        },
+                        {
+                            "title": "Earl Grey"
+                        },
+                        {
+                            "title": "Lapsang Souchong"
+                        }
+                    ]
+                },
+                {
+                    "title": "Green",
+                    "children": [
+                        {
+                            "title": "Japanese Sencha"
+                        },
+                        {
+                            "title": "Jasmine Pearls"
+                        }
+                    ]
+                }
+            ]
+        }
+    ];
 
-    /*const addChild = (id: any) => {
-        console.log('add new called');
-      //return(<TreeNode addNew={true}/>)
-    };
-*/
+    /*useEffect(() => {
+        const fetchData = async () => {
+            const data = await (addNoteDocument(DEFAULT_NODES));
+            console.log('data', data)
+            dispatch(addNoteAction(data))
+        }
+        fetchData()
+    }, [])*/
+    console.log('nodes--->>>>>', nodes)
     return (<div className={'container h-100 d-flex justify-content-center'}>
-        <ul className="Nodes d-flex justify-content-center align-items-center">
-            <TreeNode addNew={true}
-                      changeTitle={changeTitle}
-                      addChild={addChild}
-            />
+        <ul className="Nodes d-flex justify-content-center align-items-center flex-column">
+            {nodes?.map((nodeProps: any) => {
+                const {id, ...others} = nodeProps;
+                return (
+                    <TreeNode
+                        addNew={true}
+                        key={id}
+                        {...others}
+                    />
+                );
+            })}
         </ul>
     </div>)
 };

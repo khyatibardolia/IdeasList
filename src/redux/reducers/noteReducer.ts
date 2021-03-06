@@ -4,7 +4,6 @@ const initialState = {
 };
 
 export const noteReducer = (state = initialState, action: any) => {
-    console.log('paylod notes-->>', action && action.payload)
     switch (action.type) {
         case "GET_NOTES":
             return {...state, data: action?.payload};

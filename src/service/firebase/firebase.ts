@@ -48,9 +48,7 @@ export const addNoteDocument = async (note: any) => {
     const userRef = db.collection("notes");
     console.log('userRef', userRef)
     try {
-        await userRef.add({
-            note
-        });
+        await userRef.add({note});
        console.log('userRef', userRef.id);
     } catch (error) {
         console.log('Error in creating user', error);

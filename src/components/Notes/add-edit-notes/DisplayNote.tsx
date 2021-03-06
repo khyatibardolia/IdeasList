@@ -4,6 +4,7 @@ import {getAllNotesDocument} from "../../../service/firebase/firebase";
 import {useEffect} from 'react';
 import {useDispatch, useSelector} from "react-redux";
 import {getNotesAction} from "../../../redux/actions/notes";
+import * as React from "react";
 
 const DisplayNote = () => {
     const dispatch = useDispatch();
