@@ -17,7 +17,7 @@ const EditableItem = (props: any) => {
 
             <input
                 className="EditableItem-Text"
-                onChange={(e) => changeTitle(e)}
+                onChange={(e) => changeTitle(e.target.value)}
                 value={title}
                 placeholder="New Item"
             />

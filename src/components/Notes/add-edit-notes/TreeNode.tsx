@@ -7,23 +7,25 @@ const TreeNode = (props: any) => {
 
     const renderChildren = (children: any) => {
         return (
-            <ul>
+            <>
                 {children && Object.keys(children).map((key: any) => {
-                    const {...others} = children[key];
+                    const {id, ...others} = children[key];
                     return (
                         <TreeNode
-                            key={key}
+                            key={id}
+                            id={id}
                             {...others}
+                            addNew={true}
                         />
                     );
 
                 })}
-            </ul>
+            </>
         );
     };
 
     return (
-        <>
+        <ul>
             {props.title || addNew ? (
                 <li className={'mx-3'}>
                     <div className="TreeNode">
@@ -32,7 +34,7 @@ const TreeNode = (props: any) => {
                 </li>
             ) : null}
             {hasChildren && renderChildren(children)}
-        </>
+        </ul>
     );
 };
 
