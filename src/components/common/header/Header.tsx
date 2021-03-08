@@ -17,7 +17,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import {logOut} from "../../../service/firebase/auth";
 import {userAuthenticationAction} from "../../../redux/actions/authenticate";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 
 const drawerWidth = 240;
 
@@ -115,6 +115,10 @@ const Header = () => {
         dispatch(userAuthenticationAction({}))
     };
 
+    const user: any = useSelector((state: any) => {
+        return state?.auth?.user?.data
+    });
+
     return (
         <div className={classes.root}>
             <CssBaseline/>
@@ -163,6 +167,7 @@ const Header = () => {
                             open={openList}
                             onClose={handleClose}
                         >
+                            <MenuItem color={'textPrimary'}>{user?.displayName}</MenuItem>
                             <MenuItem onClick={handleLogOut}>Logout</MenuItem>
                         </Menu>
                     </div>

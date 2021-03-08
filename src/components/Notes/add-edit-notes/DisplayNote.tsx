@@ -1,36 +1,26 @@
 import {Navigation} from '../../common/hoc/Navigation';
 import TreeNode from '../add-edit-notes/TreeNode';
-import {getAllNotesDocument} from "../../../service/firebase/firebase";
-import {useEffect} from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import {getNotesAction} from "../../../redux/actions/notes";
+import {useSelector} from "react-redux";
 import * as React from "react";
+import {useHistory} from "react-router-dom";
 
-const DisplayNote = () => {
-    const dispatch = useDispatch();
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await getAllNotesDocument();
-            dispatch(getNotesAction(data));
-        };
-
-        fetchData()
-    }, [dispatch]);
-    const notes: any = useSelector((state: any) => {
+const DisplayNote = (props: any) => {
+    const {addNew, simplify, nodes} = props;
+    const history = useHistory();
+    const singleNote: any = useSelector((state: any) => {
         return state?.notes?.singleNote
     });
-    return (<div>
-        <ul className="Nodes d-flex justify-content-center align-items-center">
-            {notes && Object.keys(notes).length ? Object.keys(notes).map((keyName) => {
-                const children = notes[keyName].note;
-                return (
-                    <TreeNode
-                        key={keyName}
-                        children={children}
-                    />
-                );
-            }) : null}
+    console.log('history', history.location.state);
+    const data = singleNote && Object.keys(singleNote).length ? singleNote[0]?.note : [];
+    return (<>
+        <ul className="Nodes d-flex justify-content-center align-items-center flex-column">
+            {data?.map((nodeProps: any, index: any) => {
+                const {id, ...others} = nodeProps;
+                return <TreeNode addNew={addNew}
+                                 key={`${id}of${index}`}
+                                 id={id} {...others} />
+            })}
         </ul>
-    </div>)
+    </>)
 };
 export default Navigation(DisplayNote)

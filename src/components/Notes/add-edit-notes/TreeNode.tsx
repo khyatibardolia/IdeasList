@@ -8,11 +8,11 @@ const TreeNode = (props: any) => {
     const renderChildren = (children: any) => {
         return (
             <>
-                {children && Object.keys(children).map((key: any) => {
+                {children && Object.keys(children).map((key: any, index: any) => {
                     const {id, ...others} = children[key];
                     return (
                         <TreeNode
-                            key={id}
+                            key={`${id}of${index}`}
                             id={id}
                             {...others}
                             addNew={true}

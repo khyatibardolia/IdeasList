@@ -36,9 +36,9 @@ const Sidebar = (props: any) => {
     const getNote = useCallback(async (id: any) => {
         if(id) {
             setNoteId(id);
-            history.push(routes.DISPLAYNOTE);
             const note = await getNoteByIdDocument(id);
             dispatch(getNoteByIdAction([note]));
+            history.push({pathname: routes.ADDEDITNOTE, state: {addRootNode: false}})
         }
     }, [dispatch]);
 
@@ -50,10 +50,8 @@ const Sidebar = (props: any) => {
         fetchApi();
     }, [notes, getNote]);*/
 
-    const addNote = (e:any) => {
+    const addNote = () => {
         console.log('add note called')
-        e.preventDefault();
-        e.stopPropagation();
         history.push({pathname: routes.ADDEDITNOTE, state: {addRootNode: true}})
     };
 
@@ -76,7 +74,7 @@ const Sidebar = (props: any) => {
         }) : null}
         <Button variant="outlined" color="primary"
                 className={classes.addButton}
-                onClick={(e) => addNote(e)}>
+                onClick={addNote}>
             Add Note
         </Button>
     </>)

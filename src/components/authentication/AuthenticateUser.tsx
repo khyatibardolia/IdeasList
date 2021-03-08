@@ -7,8 +7,9 @@ import {
     Paper,
     Box,
     Grid,
-    Typography,
+    Typography, CircularProgress,
 } from '@material-ui/core';
+import { grey } from '@material-ui/core/colors';
 import {useDispatch} from "react-redux";
 import {Field, reduxForm, FormErrors, InjectedFormProps} from 'redux-form';
 import * as routes from "../../constants/routes";
@@ -31,6 +32,7 @@ interface IFormInputs {
 const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs>> = (props: any) => {
     const {handleSubmit} = props;
     const [isUserSigningUp, setUserSigningUp] = useState(false);
+    const [loading, setLoading] = React.useState(false);
     const useStyles = makeStyles((theme) => ({
         root: {
             height: '100vh',
@@ -59,6 +61,11 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
         submit: {
             margin: theme.spacing(3, 0, 2),
         },
+        fabProgress: {
+            color: grey[500],
+            marginLeft: theme.spacing(1)
+        },
+
     }));
     const dispatch = useDispatch();
     let history = useHistory();
@@ -77,7 +84,7 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
 
     const onSubmit = async (data: IFormInputs) => {
         console.log('data', data);
-        debugger;
+        setLoading(true)
         const {emailId, password, displayName} = data;
         if (isUserSigningUp) {
             try {
@@ -88,6 +95,7 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                     localStorage.setItem('token', token);
                 }
                 dispatch(userAuthenticationAction({data, token}));
+                setLoading(false)
                 history.push(routes.NOTES);
                 return data;
             } catch (error) {
@@ -104,6 +112,7 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                     }
 
                     dispatch(userAuthenticationAction({data, token}));
+                    setLoading(false)
                     history.push(routes.NOTES);
                     return data;
                 } catch (error) {
@@ -153,15 +162,22 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                                label="Password"
                                placeholder="Password"
                                name="password"/>
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            className={classes.submit}
-                        >
-                            {`${isUserSigningUp ? 'Sign Up' : 'Log in'}`}
-                        </Button>
+                        <div className={'d-flex'}>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                disabled={loading}
+                                className={classes.submit}
+                            >
+                                {`${isUserSigningUp ? 'Sign Up' : 'Log in'}`}
+                                {loading && <CircularProgress color={'secondary'}
+                                                              className={classes.fabProgress}
+                                                              size={20}/>}
+                            </Button>
+                        </div>
+
                         <Grid container>
                             <Grid item>
                                 <Link onClick={handleToggler} href="#" variant="body2">

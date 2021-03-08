@@ -45,6 +45,7 @@ export const getNoteByIdDocument = async (id: any) => {
 };
 
 export const addNoteDocument = async (note: any) => {
+    console.log('note valllll', note);
     const userRef = db.collection("notes");
     console.log('userRef', userRef)
     try {
