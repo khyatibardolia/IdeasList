@@ -17,7 +17,7 @@ export const createUserDocument = async (user?: any, additionalData?: any) => {
                 createdAt: new Date(),
             });
         } catch (error) {
-            console.log('Error in creating user', error);
+            console.log('Error in creating note: ', error);
         }
     } else {
         const userData = await userRef.get();
@@ -52,6 +52,17 @@ export const addNoteDocument = async (note: any) => {
         await userRef.add({note});
        console.log('userRef', userRef.id);
     } catch (error) {
-        console.log('Error in creating user', error);
+        console.log('Error in creating note: ', error);
+    }
+};
+
+export const deleteNoteDocument = async (id: any) => {
+    const userRef = db.collection("notes").doc(id);
+    console.log('userRef', userRef)
+    try {
+        await userRef.delete();
+        console.log('userRef', userRef.id);
+    } catch (error) {
+        console.log('Error in deleting note: ', error);
     }
 };

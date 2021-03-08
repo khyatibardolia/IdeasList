@@ -4,8 +4,8 @@ import TreeNode from './TreeNode';
 import {Button, Box} from "@material-ui/core";
 import {connect} from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import {addNoteDocument, getAllNotesDocument} from "../../../service/firebase/firebase";
-import {addNoteAction, getNotesAction} from "../../../redux/actions/notes";
+import {addNoteDocument, deleteNoteDocument, getAllNotesDocument} from "../../../service/firebase/firebase";
+import {addNoteAction, deleteNoteAction, getNotesAction} from "../../../redux/actions/notes";
 
 interface IMapStateToProps {
     singleNote?: any,
@@ -16,6 +16,7 @@ interface IMapStateToProps {
 interface IMapDispatchToProps {
     addNoteAction?: (data: any) => [];
     getNotesAction?: (data: any) => [];
+    deleteNoteAction?: (id: any) => [];
 }
 interface IState {
     nodes: any,
@@ -211,6 +212,17 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
         return nodesCopy;
     }
 
+    deleteNode = async (id: any) => {
+        if(id) {
+            const data = await deleteNoteDocument(id);
+            this.props.deleteNoteAction(data);
+            const data1 = await getAllNotesDocument();
+            this.props.getNotesAction(data1);
+        } else {
+            this.setState({nodes: []})
+        }
+    };
+
     render() {
         const {nodes, singleNote, addRootNode}: any = this.state;
         console.log('render-->>>', addRootNode)
@@ -219,15 +231,21 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
         console.log('nodes', nodes);
         console.log('singleNote', this.props?.singleNote)
         return (
-            <><Box m={3} display={'flex'} justifyContent={'flex-end'}>
+            <>{data?.length ? <Box m={3} display={'flex'} justifyContent={'flex-end'}>
                 <Button className={'mr-2'} variant="outlined" color="primary"
                         onClick={() => this.simplify(nodes)}>
                     Save
                 </Button>
-                <Button variant="outlined" color="primary">
+                <Button variant="outlined" color="primary"
+                        onClick={() => this.deleteNode(singleNote && singleNote[0]?.id)}>
                     Delete
                 </Button>
-            </Box>
+            </Box> : <div
+                className={'w-100 vh-100 d-flex justify-content-center align-items-center'}>
+                <Button variant="outlined" color="primary"
+                             onClick={() => this.addRootElement}>
+                Add Note
+            </Button></div>}
                 <div className={'container h-100 d-flex justify-content-center'}>
                     <ul className="Nodes d-flex justify-content-center align-items-center flex-column">
                         {data?.map((nodeProps: any, index: any) => {
@@ -247,6 +265,7 @@ const mapStateToProps = (state: any): any => ({
 
 const mapDispatchToProps = (dispatch: any): any => ({
     addNoteAction: (values: any) => dispatch(addNoteAction(values)),
+    deleteNoteAction: (id: any) => dispatch(deleteNoteAction(id)),
     getNotesAction: (values: any) => dispatch(getNotesAction(values)),
 });
 //export default withRouter<IMapStateToProps>(connect(mapStateToProps, mapDispatchToProps)(Navigation(AddEditNote)));
