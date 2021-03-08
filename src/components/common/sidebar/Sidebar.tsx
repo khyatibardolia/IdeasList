@@ -38,7 +38,7 @@ const Sidebar = (props: any) => {
             setNoteId(id);
             const note = await getNoteByIdDocument(id);
             dispatch(getNoteByIdAction([note]));
-            history.push({pathname: routes.ADDEDITNOTE, state: {addRootNode: false}})
+            history.push({pathname: `${routes.EDITNOTE}`})
         }
     }, [dispatch]);
 
@@ -52,7 +52,7 @@ const Sidebar = (props: any) => {
 
     const addNote = () => {
         console.log('add note called')
-        history.push({pathname: routes.ADDEDITNOTE, state: {addRootNode: true}})
+        history.push({pathname: `${routes.ADDNOTE}`})
     };
 
     return (<>

@@ -39,30 +39,18 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
     }
 
     componentDidMount() {
-        //console.log('singleNote', this.props?.singleNote)
-        this.addRootElement();
+      if (this.props.history?.location?.pathname === '/note/add') {
+        this.setState({ addRootNode: true }, () => this.addRootElement());
+      }
     }
 
     static getDerivedStateFromProps(nextProps: any, prevState: any) : any {
-        debugger;
         if(nextProps.singleNote !== prevState.singleNote) {
             return { singleNote: nextProps.singleNote, nodes: [] };
         }
-        console.log('nextProps', nextProps);
-        console.log('prevState', prevState);
-       /* if(nextProps?.location.state.addRootNode !== prevState.addRootNode){
-            return { addRootNode: nextProps?.location.state.addRootNode };
-        }*/
         return null;
     }
 
-   /* componentDidUpdate() {
-        debugger;
-        const {addRootNode} = this.state;
-        if(addRootNode) {
-            this.setState({addRootNode: false}, () => this.addRootElement);
-        }
-    }*/
     initializedNodes = (nodes: any, location?: any): any => {
         const nodesCopy = [];
         console.log('initializedNodes', nodes);
@@ -226,7 +214,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
     render() {
         const {nodes, singleNote, addRootNode}: any = this.state;
         console.log('render-->>>', addRootNode)
-        const data = singleNote && Object.keys(singleNote).length ? singleNote[0]?.note : nodes
+        const data = !addRootNode && singleNote && Object.keys(singleNote).length ? singleNote[0]?.note : nodes
         console.log('data', data);
         console.log('nodes', nodes);
         console.log('singleNote', this.props?.singleNote)

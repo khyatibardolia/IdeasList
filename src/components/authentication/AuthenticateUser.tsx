@@ -45,6 +45,7 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
             backgroundPosition: 'center',
         },
         paper: {
+            padding: '0px 72px',
             margin: theme.spacing(8, 4),
             display: 'flex',
             flexDirection: 'column',

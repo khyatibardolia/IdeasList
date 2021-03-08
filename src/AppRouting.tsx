@@ -27,8 +27,9 @@ export const AppRouting = () => {
             <Switch>
                 <Route exact path={routes.LOGIN} component={AuthenticateUser}/>
                 <Route exact path={routes.NOTES} component={authGuard(Notes)}/>
-                <Route exact path={routes.ADDEDITNOTE} component={authGuard(AddEditNote)}/>
-                <Route exact path={routes.DISPLAYNOTE} component={authGuard(DisplayNote)}/>
+                <Route exact path={`${routes.ADDNOTE}`} component={authGuard(AddEditNote)}/>
+                <Route exact path={`${routes.EDITNOTE}`} component={authGuard(AddEditNote)}/>
+                {/* <Route exact path={routes.DISPLAYNOTE} component={authGuard(DisplayNote)}/> */}
                 <Route component={PageNotFound}/>
             </Switch>
         </BrowserRouter>

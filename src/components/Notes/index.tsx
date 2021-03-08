@@ -105,7 +105,7 @@ const Notes = () => {
                     </CardContent>
                     <CardActions className={'d-flex justify-content-center'}>
                         <Button variant="outlined" color="primary" onClick={() =>
-                            history.push({pathname: routes.ADDEDITNOTE, state: {addRootNode: true}})}>
+                            history.push({pathname: `${routes.ADDNOTE}`})}>
                             Add Notes
                         </Button>
                     </CardActions>
