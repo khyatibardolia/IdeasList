@@ -21,6 +21,9 @@ import {userAuthenticationAction} from "../../redux/actions/authenticate";
 import {createUserDocument} from "../../service/firebase/firebase";
 import {RenderTextField} from '../common/fields/RenderTextField';
 import Image from '../../assets/background-img.svg';
+import {toast} from "react-toastify";
+import { useCookies } from 'react-cookie';
+import './AuthenticateUser.scss'
 
 interface IFormInputs {
     emailId: string,
@@ -33,6 +36,9 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
     const {handleSubmit} = props;
     const [isUserSigningUp, setUserSigningUp] = useState(false);
     const [loading, setLoading] = React.useState(false);
+    const [cookies, setCookie] = useCookies(['user']);
+
+    console.log('cookies', cookies);
     const useStyles = makeStyles((theme) => ({
         root: {
             height: '100vh',
@@ -45,7 +51,7 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
             backgroundPosition: 'center',
         },
         paper: {
-            padding: '0px 72px',
+            padding: theme.spacing(14),
             margin: theme.spacing(8, 4),
             display: 'flex',
             flexDirection: 'column',
@@ -84,7 +90,6 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
     };
 
     const onSubmit = async (data: IFormInputs) => {
-        console.log('data', data);
         setLoading(true)
         const {emailId, password, displayName} = data;
         if (isUserSigningUp) {
@@ -95,12 +100,15 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                 if(token) {
                     localStorage.setItem('token', token);
                 }
+                setCookie('user', {data, token}, { path: '/' });
                 dispatch(userAuthenticationAction({data, token}));
-                setLoading(false)
+                setLoading(false);
+                toast.success(`Welcome to Moar! ${displayName}`);
                 history.push(routes.NOTES);
                 return data;
             } catch (error) {
-                console.log(error)
+                setLoading(false);
+                toast.error(error?.message);
             }
         } else {
             if (emailId && password) {
@@ -111,13 +119,14 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                     if(token) {
                         localStorage.setItem('token', token);
                     }
-
+                    setCookie('user', {data, token}, { path: '/' });
                     dispatch(userAuthenticationAction({data, token}));
-                    setLoading(false)
+                    setLoading(false);
                     history.push(routes.NOTES);
                     return data;
                 } catch (error) {
-                    console.log(error)
+                    setLoading(false);
+                    toast.error(error?.message);
                 }
             }
         }
@@ -130,15 +139,15 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
     const classes = useStyles();
     /*console.log('userData-->>>', userData)*/
     return (
-        <Grid container component="main" className={classes.root}>
+        <Grid container component="main" className={`${classes.root} authentication-form`}>
             <CssBaseline/>
-            <Grid item xs={false} sm={4} md={6} className={'d-flex justify-content-center align-items-center'}>
+            <Grid item xs={false} sm={4} md={6} className={'left-img d-flex justify-content-center align-items-center'}>
                 <img src={Image} className={classes.image} alt={'list_img'}/>
             </Grid>
             <Grid item xs={12} sm={8} md={6}
                   className="d-flex justify-content-center align-items-center"
                   component={Paper} elevation={6} square>
-                <div className={classes.paper}>
+                <div className={`${classes.paper} form-grid`}>
                     <Typography className={'mb-3'} component="h1" variant="h4">
                         Welcome to Moar
                     </Typography>
@@ -212,7 +221,7 @@ const validate = (values: IFormInputs): FormErrors<IFormInputs> => {
         errors.emailId = 'Invalid email address'
     }
     return errors;
-}
+};
 
 export default reduxForm<{}, IFormInputs>({
     form: 'userForm',

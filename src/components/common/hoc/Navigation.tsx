@@ -7,7 +7,7 @@ export const Navigation = <P extends object>(
     return (
         <>
             <Header/>
-            <div className={'w-100 h-100'} style={{marginTop:'6rem'}}>
+            <div className={'w-100 h-100'}>
                 <Component {...props as P}/>
             </div>
         </>

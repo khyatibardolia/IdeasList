@@ -10,19 +10,18 @@ type Props = {
     name: string
     showError: boolean
     input: any
-    meta: {touched: any, error: any}
+    meta: { touched: any, error: any }
 }
 export const RenderTextField: React.FC<Props> = (props: any) => {
     const {input, label, meta: {touched, error}, ...custom} = props;
-    return <TextField hintText={label}
-                        variant="outlined"
-                        margin="normal"
-                        fullWidth
-                        floatingLabelText={label}
-                        errorText={touched && error}
-                        {...input}
-                        {...custom}
-                        error={Boolean(touched && error)}
-                        helperText={touched ? error : ''}/>
+    return <TextField id="outlined-error-helper-text"
+                      label={label}
+                      variant="outlined"
+                      fullWidth
+                      {...input}
+                      {...custom}
+                      className={'my-2'}
+                      error={Boolean(touched && error)}
+                      helperText={touched ? error : ''}/>
 
 };

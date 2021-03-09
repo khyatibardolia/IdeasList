@@ -8,7 +8,7 @@ import {
     Theme,
     createStyles
 } from '@material-ui/core';
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import {getNoteByIdDocument} from "../../../service/firebase/firebase";
@@ -24,14 +24,14 @@ const useStyles = makeStyles((theme: Theme) =>
         },
     }));
 
-const Sidebar = (props: any) => {
+const Sidebar = () => {
     const dispatch = useDispatch();
     const history = useHistory();
     const [selectedNoteId, setNoteId] = useState('');
     const notes: any = useSelector((state: any) => {
         return state?.notes?.data
     });
-    console.log('notes', notes);
+
     const classes = useStyles();
     const getNote = useCallback(async (id: any) => {
         if(id) {
@@ -40,18 +40,9 @@ const Sidebar = (props: any) => {
             dispatch(getNoteByIdAction([note]));
             history.push({pathname: `${routes.EDITNOTE}`})
         }
-    }, [dispatch]);
-
-    /*useEffect(() => {
-        console.log('useEffectttttttttttt')
-        const fetchApi = async () => {
-            await getNote(notes && notes[0]?.id)
-        }
-        fetchApi();
-    }, [notes, getNote]);*/
+    }, [dispatch, history]);
 
     const addNote = () => {
-        console.log('add note called')
         history.push({pathname: `${routes.ADDNOTE}`})
     };
 

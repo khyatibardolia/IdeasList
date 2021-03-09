@@ -4,8 +4,6 @@ export const createUserDocument = async (user?: any, additionalData?: any) => {
     const userRef = db.collection("users").doc(`${user.uid}`);
     const snapshot = await userRef.get();
 
-    console.log('user', user);
-    console.log('snapshot', snapshot)
     if (!snapshot.exists) {
         const {email, emailVerified} = user;
         const {displayName} = additionalData;
@@ -32,7 +30,6 @@ export const getAllNotesDocument = async () => {
         const id = doc.id;
         return { id, ...data };
     });
-    console.log('allNotes', allNotes)
     return allNotes;
 };
 
@@ -45,12 +42,9 @@ export const getNoteByIdDocument = async (id: any) => {
 };
 
 export const addNoteDocument = async (note: any) => {
-    console.log('note valllll', note);
     const userRef = db.collection("notes");
-    console.log('userRef', userRef)
     try {
         await userRef.add({note});
-       console.log('userRef', userRef.id);
     } catch (error) {
         console.log('Error in creating note: ', error);
     }
@@ -58,10 +52,8 @@ export const addNoteDocument = async (note: any) => {
 
 export const deleteNoteDocument = async (id: any) => {
     const userRef = db.collection("notes").doc(id);
-    console.log('userRef', userRef)
     try {
         await userRef.delete();
-        console.log('userRef', userRef.id);
     } catch (error) {
         console.log('Error in deleting note: ', error);
     }

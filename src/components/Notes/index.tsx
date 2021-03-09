@@ -11,7 +11,6 @@ import * as routes from "../../constants/routes";
 import {useDispatch, useSelector} from "react-redux";
 import {getAllNotesDocument, getNoteByIdDocument} from '../../service/firebase/firebase';
 import {getNoteByIdAction, getNotesAction} from '../../redux/actions/notes';
-import DisplayNote from "./add-edit-notes/DisplayNote";
 import {CircularProgress} from "@material-ui/core";
 import AddEditNote from "./add-edit-notes/AddEditNote";
 
@@ -38,7 +37,6 @@ const Notes = () => {
     const [loading, setLoader] = useState(false);
     const dispatch = useDispatch();
     useEffect(() => {
-        console.log('display use effect calleddddddd')
         setLoader(true);
         const fetchData = async () => {
             const data = await getAllNotesDocument();
@@ -54,44 +52,11 @@ const Notes = () => {
         return state?.notes?.singleNote
     });
     const hasNotes = singleNote && singleNote?.length;
-    /*if(hasNotes) {
-        history.push({pathname: routes.ADDEDITNOTE, state: {addRootNode: false}})
-    }*/
-    /*return (<>{!hasNotes ?
-        <div className={'container h-100 d-flex justify-content-center'}>
-            <Card className={`${classes.root} shadow mx-5 p-5`} variant="outlined">
-                <CardContent className={'text-center'}>
-                    <Typography className={classes.title} color="textPrimary" gutterBottom>
-                        Turn Your Ideas Into Reality
-                    </Typography>
-                    <Typography color="textSecondary">
-                        Go from big picture thinking to deep focus mode in an instant, Moar’s infinitely nesting
-                        structure
-                        lets you focus on what’s important to you right now.
-                    </Typography>
-                </CardContent>
-                <CardActions className={'d-flex justify-content-center'}>
-                    <Button variant="outlined" color="primary" onClick={() =>
-                        history.push({pathname: routes.ADDEDITNOTE, state: {addRootNode: true}})}>
-                        Add Notes
-                    </Button>
-                </CardActions>
-            </Card>
-        </div>
-        :
-        <div>
-            {loading ?
-                <CircularProgress color={'primary'}
-                                  size={20}/>
-                :
-                <DisplayNote addNew={false}/>}
-        </div>}
-    </>)*/
     return(<>{loading ?
-      <div className={'vh-100 d-flex justify-content-center align-items-center'}><CircularProgress color={'primary'}
-                             size={20}/></div> :
+      <div className={'vh-100 d-flex justify-content-center align-items-center'}>
+          <CircularProgress color={'primary'} size={20}/></div> :
         hasNotes ?
-            <AddEditNote/> :  <div className={'container h-100 d-flex justify-content-center'}>
+            <div className={'mt-0'}><AddEditNote/></div> :  <div className={'container h-100 d-flex justify-content-center'}>
                 <Card className={`${classes.root} shadow mx-5 p-5`} variant="outlined">
                     <CardContent className={'text-center'}>
                         <Typography className={classes.title} color="textPrimary" gutterBottom>

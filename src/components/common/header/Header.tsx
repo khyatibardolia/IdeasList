@@ -18,6 +18,7 @@ import Menu from '@material-ui/core/Menu';
 import {logOut} from "../../../service/firebase/auth";
 import {userAuthenticationAction} from "../../../redux/actions/authenticate";
 import {useDispatch, useSelector} from "react-redux";
+import { withCookies } from 'react-cookie';
 
 const drawerWidth = 240;
 
@@ -25,6 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
     createStyles({
         root: {
             display: 'flex',
+            height: '20%'
         },
         appBar: {
             transition: theme.transitions.create(['margin', 'width'], {
@@ -86,7 +88,8 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-const Header = () => {
+const Header = (props: any) => {
+    const {cookies} = props;
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
@@ -112,7 +115,8 @@ const Header = () => {
 
     const handleLogOut = async () => {
         await logOut();
-        dispatch(userAuthenticationAction({}))
+        cookies.remove('user');
+        dispatch(userAuthenticationAction({}));
     };
 
     const user: any = useSelector((state: any) => {
@@ -120,7 +124,7 @@ const Header = () => {
     });
 
     return (
-        <div className={classes.root}>
+        <>
             <CssBaseline/>
             <AppBar
                 position="fixed"
@@ -190,7 +194,7 @@ const Header = () => {
                 <Divider/>
                 <Sidebar/>
             </Drawer>
-        </div>
+        </>
     );
 };
-export default Header;
+export default withCookies(Header);
