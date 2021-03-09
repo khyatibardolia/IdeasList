@@ -8,12 +8,14 @@ export const createUserDocument = async (user?: any, additionalData?: any) => {
         const {email} = user;
         const {displayName} = additionalData;
         try {
-            return await userRef.set({
+            await userRef.set({
                 id: user.uid,
                 displayName,
                 email,
                 createdAt: new Date(),
             });
+            const userData = await userRef.get();
+            return userData.data()
         } catch (error) {
             console.log('Error in creating note: ', error);
         }
@@ -39,7 +41,9 @@ export const getNoteByIdDocument = async (id: any) => {
     const snapshot = await note.get();
     const data = snapshot.data();
     const key = snapshot.id;
-    return {id: key, ...data};
+    if(key && data) {
+        return {id: key, ...data};
+    }
 };
 
 export const addNoteDocument = async (note: any, uid: any) => {

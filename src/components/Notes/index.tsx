@@ -44,8 +44,7 @@ const Notes = () => {
         const fetchData = async () => {
             const data = await getAllNotesDocument(user?.id);
             dispatch(getNotesAction(data));
-            console.log('sdsdsd', data)
-            if (data) {
+            if (data && data.length) {
                 const note = await getNoteByIdDocument(data && data[0]?.id);
                 dispatch(getNoteByIdAction([note]));
             }

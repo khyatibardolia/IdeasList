@@ -236,7 +236,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
                     Delete
                 </Button>
             </Box> : <div
-                className={'w-100 vh-100 d-flex justify-content-center align-items-center'}>
+                className={'w-100 d-flex justify-content-center align-items-center'}>
                 <Button variant="outlined" color="primary"
                         onClick={() => this.addRootElement()}>
                     Add Note
