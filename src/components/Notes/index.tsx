@@ -36,27 +36,34 @@ const Notes = () => {
 
     const [loading, setLoader] = useState(false);
     const dispatch = useDispatch();
+    const user: any = useSelector((state: any) => {
+        return state?.auth?.user?.data
+    });
     useEffect(() => {
         setLoader(true);
         const fetchData = async () => {
-            const data = await getAllNotesDocument();
+            const data = await getAllNotesDocument(user?.id);
             dispatch(getNotesAction(data));
-            const note = await getNoteByIdDocument(data && data[0]?.id);
-            dispatch(getNoteByIdAction([note]));
+            console.log('sdsdsd', data)
+            if (data) {
+                const note = await getNoteByIdDocument(data && data[0]?.id);
+                dispatch(getNoteByIdAction([note]));
+            }
             setLoader(false);
         };
         fetchData()
-    }, [dispatch]);
+    }, [dispatch, user?.id]);
 
     const singleNote: any = useSelector((state: any) => {
         return state?.notes?.singleNote
     });
     const hasNotes = singleNote && singleNote?.length;
-    return(<>{loading ?
-      <div className={'vh-100 d-flex justify-content-center align-items-center'}>
-          <CircularProgress color={'primary'} size={20}/></div> :
+    return (<>{loading ?
+        <div className={'vh-100 d-flex justify-content-center align-items-center'}>
+            <CircularProgress color={'primary'} size={20}/></div> :
         hasNotes ?
-            <div className={'mt-0'}><AddEditNote/></div> :  <div className={'container h-100 d-flex justify-content-center'}>
+            <div className={'mt-0'}><AddEditNote/></div> :
+            <div className={'container h-100 d-flex justify-content-center'}>
                 <Card className={`${classes.root} shadow mx-5 p-5`} variant="outlined">
                     <CardContent className={'text-center'}>
                         <Typography className={classes.title} color="textPrimary" gutterBottom>

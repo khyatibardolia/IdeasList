@@ -8,11 +8,11 @@ import {
     Theme,
     createStyles
 } from '@material-ui/core';
-import React, {useCallback, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
-import {getNoteByIdDocument} from "../../../service/firebase/firebase";
-import {getNoteByIdAction} from "../../../redux/actions/notes";
+import {getAllNotesDocument, getNoteByIdDocument} from "../../../service/firebase/firebase";
+import {getNoteByIdAction, getNotesAction} from "../../../redux/actions/notes";
 import './Sidebar.scss';
 import {useHistory} from "react-router-dom";
 import * as routes from '../../../constants/routes';
@@ -31,8 +31,22 @@ const Sidebar = () => {
     const notes: any = useSelector((state: any) => {
         return state?.notes?.data
     });
+    const user: any = useSelector((state: any) => {
+        return state?.auth?.user?.data
+    });
 
     const classes = useStyles();
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await getAllNotesDocument(user?.id);
+            dispatch(getNotesAction(data));
+            if (data) {
+                const note = await getNoteByIdDocument(data && data[0]?.id);
+                dispatch(getNoteByIdAction([note]));
+            }
+        };
+        fetchData()
+    }, [dispatch, user?.id]);
     const getNote = useCallback(async (id: any) => {
         if(id) {
             setNoteId(id);
@@ -50,7 +64,7 @@ const Sidebar = () => {
         {notes && Object.keys(notes).length ? Object.keys(notes).map((keyName) => {
             const id = notes[keyName]?.id;
             const isNoteSelected = selectedNoteId === id;
-            const parentNodeTitle = notes[keyName]?.note[0]?.title;
+            const parentNodeTitle = notes[keyName]?.note[0]?.title || '';
             return (
                 <List key={keyName} className={'note-list'}>
                     <ListItem button key={keyName} onClick={() => getNote(id)}>

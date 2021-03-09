@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import clsx from 'clsx';
 import {makeStyles, useTheme, Theme, createStyles} from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -19,6 +19,7 @@ import {logOut} from "../../../service/firebase/auth";
 import {userAuthenticationAction} from "../../../redux/actions/authenticate";
 import {useDispatch, useSelector} from "react-redux";
 import { withCookies } from 'react-cookie';
+import {getNoteByIdAction} from "../../../redux/actions/notes";
 
 const drawerWidth = 240;
 
@@ -92,12 +93,12 @@ const Header = (props: any) => {
     const {cookies} = props;
     const classes = useStyles();
     const theme = useTheme();
-    const [open, setOpen] = React.useState(false);
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [open, setOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const openList = Boolean(anchorEl);
     const dispatch = useDispatch();
 
-    const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    const handleMenu = (event: any) => {
         setAnchorEl(event.currentTarget);
     };
 
@@ -115,8 +116,9 @@ const Header = (props: any) => {
 
     const handleLogOut = async () => {
         await logOut();
-        cookies.remove('user');
         dispatch(userAuthenticationAction({}));
+        dispatch(getNoteByIdAction([]));
+        cookies.remove('user', { path: '/' });
     };
 
     const user: any = useSelector((state: any) => {
@@ -150,7 +152,7 @@ const Header = (props: any) => {
                             aria-label="account of current user"
                             aria-controls="menu-appbar"
                             aria-haspopup="true"
-                            onClick={handleMenu}
+                            onClick={(e) => handleMenu(e)}
                             color="inherit"
                             className={classes.userMenu}
                         >

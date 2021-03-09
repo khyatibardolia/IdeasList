@@ -98,13 +98,12 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                 const data = await createUserDocument(user, {displayName});
                 const token = await getAuthToken();
                 if(token) {
-                    localStorage.setItem('token', token);
+                    dispatch(userAuthenticationAction({data, token}));
+                    setLoading(false);
+                    toast.success(`Welcome to Moar! ${displayName}`);
+                    setCookie('user', {data, token}, { path: '/' });
+                    history.push(routes.NOTES);
                 }
-                setCookie('user', {data, token}, { path: '/' });
-                dispatch(userAuthenticationAction({data, token}));
-                setLoading(false);
-                toast.success(`Welcome to Moar! ${displayName}`);
-                history.push(routes.NOTES);
                 return data;
             } catch (error) {
                 setLoading(false);
@@ -117,13 +116,12 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                     const data = await createUserDocument(user);
                     const token = await getAuthToken();
                     if(token) {
-                        localStorage.setItem('token', token);
+                        setCookie('user', {data, token}, { path: '/' });
+                        dispatch(userAuthenticationAction({data, token}));
+                        setLoading(false);
+                        history.push(routes.NOTES);
                     }
-                    setCookie('user', {data, token}, { path: '/' });
-                    dispatch(userAuthenticationAction({data, token}));
-                    setLoading(false);
-                    history.push(routes.NOTES);
-                    return data;
+                   return data;
                 } catch (error) {
                     setLoading(false);
                     toast.error(error?.message);

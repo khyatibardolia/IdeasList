@@ -4,12 +4,17 @@ import TreeNode from './TreeNode';
 import {Button, Box} from "@material-ui/core";
 import {connect} from 'react-redux';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
-import {addNoteDocument, deleteNoteDocument, getAllNotesDocument} from "../../../service/firebase/firebase";
+import {
+    addNoteDocument,
+    deleteNoteDocument,
+    getAllNotesDocument
+} from "../../../service/firebase/firebase";
 import {addNoteAction, deleteNoteAction, getNotesAction} from "../../../redux/actions/notes";
 import {toast} from 'react-toastify';
 
 interface IMapStateToProps {
     singleNote?: any,
+    user?: any,
     title?: '',
     history?: any,
 }
@@ -39,28 +44,22 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
         };
     }
 
+
     componentDidMount() {
-        const {singleNote} = this.props;
+        //const {singleNote} = this.props;
         if (this.props.history?.location?.pathname === '/note/add') {
-            this.setState({addRootNode: true}, () => this.addRootElement());
-        } else {
+            this.setState({ addRootNode: true }, () => this.addRootElement());
+        } /*else {
             this.initializedNodes(singleNote[0]?.note)
             this.setState({singleNote: singleNote[0]?.note})
-        }
+        }*/
     }
 
-    static getDerivedStateFromProps(nextProps: any, prevState: any): any {
-        if (nextProps.singleNote !== prevState.singleNote) {
-            return {singleNote: nextProps.singleNote, nodes: []};
+    static getDerivedStateFromProps(nextProps: any, prevState: any) : any {
+        if(nextProps.singleNote !== prevState.singleNote) {
+            return { singleNote: nextProps.singleNote };
         }
         return null;
-    }
-
-    componentDidUpdate() {
-        const {singleNote} = this.state;
-        if (singleNote) {
-            this.initializedNodes(singleNote[0]?.note)
-        }
     }
 
     initializedNodes = (nodes: any, location?: any): any => {
@@ -200,19 +199,21 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
 
     saveNodes = async () => {
         const {nodes} = this.state;
+        const {user} = this.props;
         const nodesCopy = this.simplify(nodes)
-        const data = await addNoteDocument(nodesCopy);
+        const data = await addNoteDocument(nodesCopy, user?.id);
         this.props.addNoteAction(data);
-        const allNotes = await getAllNotesDocument();
+        const allNotes = await getAllNotesDocument(user?.id);
         this.props.getNotesAction(allNotes);
         toast.success('Note saved successfully!')
     };
 
     deleteNode = async (id: any) => {
+        const {user} = this.props;
         if (id) {
             const data = await deleteNoteDocument(id);
             this.props.deleteNoteAction(data);
-            const data1 = await getAllNotesDocument();
+            const data1 = await getAllNotesDocument(user?.id);
             this.props.getNotesAction(data1);
         } else {
             this.setState({nodes: []})
@@ -224,7 +225,6 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
         const {nodes, singleNote, addRootNode}: any = this.state;
         //  const a = this.initializedNodes(singleNote[0]?.note);
         const data = !addRootNode && singleNote && Object.keys(singleNote).length ? singleNote[0]?.note : nodes
-        console.log('data', data)
         return (
             <div className={'mt-6'}>{data?.length ? <Box m={3} display={'flex'} justifyContent={'flex-end'}>
                 <Button className={'mr-2'} variant="outlined" color="primary"
@@ -259,6 +259,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
 
 const mapStateToProps = (state: any): any => ({
     singleNote: state?.notes?.singleNote,
+    user: state?.auth?.user?.data,
 });
 
 const mapDispatchToProps = (dispatch: any): any => ({
