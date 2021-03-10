@@ -135,7 +135,7 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
     };
 
     const classes = useStyles();
-    /*console.log('userData-->>>', userData)*/
+
     return (
         <Grid container component="main" className={`${classes.root} authentication-form`}>
             <CssBaseline/>
@@ -148,6 +148,9 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                 <div className={`${classes.paper} form-grid`}>
                     <Typography className={'mb-3'} component="h1" variant="h4">
                         Welcome to Moar
+                    </Typography>
+                    <Typography className={'mb-3'} color={'secondary'} component="h6" variant="h6">
+                        Organize your ideas, and make them real!
                     </Typography>
                     <Avatar className={classes.avatar}>
                         <LockOutlinedIcon/>
