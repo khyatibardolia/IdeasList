@@ -254,7 +254,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
         const isEditMode = history?.location?.pathname.includes('/edit');
         console.log('nodes', nodes)
         return (
-            <div className={'mt-6'}>{nodes?.length ? <Box m={3} display={'flex'} justifyContent={'flex-end'}>
+            <div className={'mt-6'}>{nodes?.length ? <Box m={3} className={'action-btn'} display={'flex'} justifyContent={'flex-end'}>
                 <Button className={'mr-2'} variant="outlined" color="primary"
                         onClick={() => this.saveNodes(isEditMode)}>
                     {`${isEditMode ? 'Update' : 'Save'}`}
@@ -270,11 +270,10 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
                     Add Note
                 </Button></div>}
                 <div className={'container h-100 d-flex justify-content-center'}>
-                    <ul className="Nodes d-flex justify-content-center align-items-center flex-column">
+                    <ul className="d-flex justify-content-center align-items-center flex-column p-0">
                         {nodes?.map((nodeProps: any, index: any) => {
                             const {id, ...others} = nodeProps;
-                            return <TreeNode addNew={true}
-                                             key={`${id}of${index}`}
+                            return <TreeNode key={`${id}of${index}`}
                                              id={id}
                                              {...others} />;
                         })}

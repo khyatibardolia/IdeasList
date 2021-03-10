@@ -27,7 +27,7 @@ const EditableItem = (props: any) => {
     const classes = useStyles();
 
     return (
-        <div className="EditableItem">
+        <>
             <Button
                 className={classes.noteBtn}
                 variant="outlined" color="primary"
@@ -47,10 +47,10 @@ const EditableItem = (props: any) => {
                 className={classes.noteTextField}
                 onChange={(e) => changeTitle(e.target.value)}
                 value={title}
-                placeholder="New Item"
+                placeholder="note"
             />
 
-        </div>
+        </>
     );
 };
 

@@ -2,7 +2,7 @@ import React from "react";
 import EditableItem from "./EditableItem";
 
 const TreeNode = (props: any) => {
-    const {children, addNew, ...otherProps} = props;
+    const {children, ...otherProps} = props;
     const hasChildren = children !== undefined;
 
     const renderChildren = (children: any) => {
@@ -26,13 +26,9 @@ const TreeNode = (props: any) => {
 
     return (
         <ul>
-            {props.title || addNew ? (
-                <li className={'mx-3'}>
-                    <div className="TreeNode">
-                        <EditableItem {...otherProps} />
-                    </div>
-                </li>
-            ) : null}
+            <li className={'mx-3'}>
+                <EditableItem {...otherProps} />
+            </li>
             {hasChildren && renderChildren(children)}
         </ul>
     );
