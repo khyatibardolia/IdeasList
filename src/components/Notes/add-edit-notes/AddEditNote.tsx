@@ -11,6 +11,7 @@ import {
 } from "../../../service/firebase/firebase";
 import {addNoteAction, deleteNoteAction, getNotesAction} from "../../../redux/actions/notes";
 import {toast} from 'react-toastify';
+import Spinner from '../../common/spinner/Spinner';
 
 interface IMapStateToProps {
     singleNote?: any,
@@ -45,13 +46,13 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
     }
 
 
-    componentDidMount() {        
+    componentDidMount() {               
         if (this.props.history?.location?.pathname === '/note/add') {
             this.setState({ addRootNode: true }, () => this.addRootElement());
         }
     }
 
-    componentDidUpdate () {                
+    componentDidUpdate () {                        
         if (this.props.history?.location?.pathname === '/note/edit' && (this.state.singleNote||[]).length && (this.props.singleNote||[]).length && 
         this.state.singleNote[0].id !== this.props.singleNote[0].id) {            
             const allNodes = this.initializedNodes(this.props.singleNote[0].note);
@@ -249,6 +250,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
                         })}
                     </ul>
                 </div>
+                {this.props.loader && <Spinner />}
             </div>
         );
     }
@@ -257,6 +259,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
 const mapStateToProps = (state: any): any => ({
     singleNote: state?.notes?.singleNote,
     user: state?.auth?.user?.data,
+    loader: state.globals.loader,
 });
 
 const mapDispatchToProps = (dispatch: any): any => ({

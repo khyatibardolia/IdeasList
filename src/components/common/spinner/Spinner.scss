@@ -1,0 +1,19 @@
+.spinner-loading-div {
+    // position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    opacity: 0.6;
+    z-index: 1200;
+    position: fixed;
+    display: block;
+  }
+  
+  .spinner-loading {
+    position: absolute;
+    top: 50%;
+    left: 45%;
+  }
+  
