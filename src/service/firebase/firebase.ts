@@ -49,7 +49,7 @@ export const getNoteByIdDocument = async (id: any) => {
 export const addNoteDocument = async (note: any, uid: any) => {
     const userRef = db.collection("notes");
     try {
-        await userRef.add({userId: uid, note});
+       return await userRef.add({userId: uid, note});
     } catch (error) {
         console.log('Error in creating note: ', error);
     }

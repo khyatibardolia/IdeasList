@@ -8,9 +8,15 @@ import * as routes from '../../../constants/routes';
 import {
     addNoteDocument,
     deleteNoteDocument,
-    getAllNotesDocument, updateNoteDocument
+    getAllNotesDocument, getNoteByIdDocument, updateNoteDocument
 } from "../../../service/firebase/firebase";
-import {addNoteAction, deleteNoteAction, getNotesAction, updateNoteAction} from "../../../redux/actions/notes";
+import {
+    addNoteAction,
+    deleteNoteAction,
+    getNoteByIdAction,
+    getNotesAction,
+    updateNoteAction
+} from "../../../redux/actions/notes";
 import {toast} from 'react-toastify';
 import Spinner from '../../common/spinner/Spinner';
 import {setLoader} from "../../../redux/actions/global";
@@ -28,6 +34,7 @@ interface IMapDispatchToProps {
     deleteNoteAction?: (id: any) => [];
     updateNoteAction?: (data: any) => [];
     setLoader?: (data: any) => [];
+    getNoteByIdAction?: (id: any) => [];
 }
 
 interface IState {
@@ -68,7 +75,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
 
     initializedNodes = (nodes: any, location?: any): any => {
         const nodesCopy = [];
-        if(nodes && nodes.length) {
+        if (nodes && nodes.length) {
             for (let i = 0; i < nodes.length; i++) {
                 const {children, title} = nodes[i];
                 const hasChildren = children !== undefined;
@@ -206,17 +213,18 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
 
     saveNodes = async (isEditMode: boolean) => {
         const {nodes, singleNote} = this.state;
-        const {user, addNoteAction, updateNoteAction, history, setLoader} = this.props;
+        const {user, addNoteAction, updateNoteAction, history, setLoader, getNoteByIdAction} = this.props;
         const nodesCopy = this.simplify(nodes);
         setLoader(true);
         if (!isEditMode) {
-            if(nodes && nodes[0]?.title !== "") {
+            if (nodes && nodes[0]?.title !== "") {
                 const data = await addNoteDocument(nodesCopy, user?.id);
                 addNoteAction(data);
-                this.setState({nodes: singleNote?.note});
+                const note = await getNoteByIdDocument(data && data?.id);
+                getNoteByIdAction(note);
                 setLoader(false);
                 history.push(routes.EDITNOTE);
-                toast.success(`Note saved successfully!`)
+                toast.success(`Note saved successfully!`);
                 this.getAllNotes();
             } else {
                 setLoader(false);
@@ -249,26 +257,27 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
     };
 
     render() {
-        const {nodes, singleNote }: any = this.state;
-        const {loader, history }: any = this.props;
+        const {nodes, singleNote}: any = this.state;
+        const {loader, history}: any = this.props;
         const isEditMode = history?.location?.pathname.includes('/edit');
         console.log('nodes', nodes)
         return (
-            <div className={'mt-6'}>{nodes?.length ? <Box m={3} className={'action-btn'} display={'flex'} justifyContent={'flex-end'}>
-                <Button className={'mr-2'} variant="outlined" color="primary"
-                        onClick={() => this.saveNodes(isEditMode)}>
-                    {`${isEditMode ? 'Update' : 'Save'}`}
-                </Button>
-                {singleNote && singleNote?.id ? <Button variant="outlined" color="secondary"
-                        onClick={() => this.deleteNode(singleNote && singleNote?.id)}>
-                    Delete
-                </Button> : null}
-            </Box> : <div
-                className={'w-100 d-flex justify-content-center align-items-center'}>
-                <Button variant="outlined" color="primary"
-                        onClick={() => this.addRootElement()}>
-                    Add Note
-                </Button></div>}
+            <div className={'mt-6'}>{nodes?.length ?
+                <Box m={3} className={'action-btn'} display={'flex'} justifyContent={'flex-end'}>
+                    <Button className={'mr-2'} variant="outlined" color="primary"
+                            onClick={() => this.saveNodes(isEditMode)}>
+                        {`${isEditMode ? 'Update' : 'Save'}`}
+                    </Button>
+                    {singleNote && singleNote?.id ? <Button variant="outlined" color="secondary"
+                                                            onClick={() => this.deleteNode(singleNote && singleNote?.id)}>
+                        Delete
+                    </Button> : null}
+                </Box> : <div
+                    className={'w-100 d-flex justify-content-center align-items-center'}>
+                    <Button variant="outlined" color="primary"
+                            onClick={() => this.addRootElement()}>
+                        Add Note
+                    </Button></div>}
                 <div className={'container h-100 d-flex justify-content-center'}>
                     <ul className="d-flex justify-content-center align-items-center flex-column p-0">
                         {nodes?.map((nodeProps: any, index: any) => {
@@ -279,7 +288,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
                         })}
                     </ul>
                 </div>
-                {loader ? <Spinner /> : null}
+                {loader ? <Spinner/> : null}
             </div>
         );
     }
@@ -297,6 +306,7 @@ const mapDispatchToProps = (dispatch: any): any => ({
     getNotesAction: (values: any) => dispatch(getNotesAction(values)),
     updateNoteAction: (values: any) => dispatch(updateNoteAction(values)),
     setLoader: (loading: any) => dispatch(setLoader(loading)),
+    getNoteByIdAction: (id: any) => dispatch(getNoteByIdAction(id)),
 });
 
 export default withRouter(connect(

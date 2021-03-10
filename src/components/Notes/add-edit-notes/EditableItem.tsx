@@ -1,4 +1,4 @@
-import {TextField, Button, makeStyles} from "@material-ui/core";
+import {TextField, Button, makeStyles, Box} from "@material-ui/core";
 import {red} from '@material-ui/core/colors';
 import clsx from 'clsx';
 import * as React from "react";
@@ -27,7 +27,7 @@ const EditableItem = (props: any) => {
     const classes = useStyles();
 
     return (
-        <>
+        <Box display={'flex'}>
             <Button
                 className={classes.noteBtn}
                 variant="outlined" color="primary"
@@ -50,7 +50,7 @@ const EditableItem = (props: any) => {
                 placeholder="note"
             />
 
-        </>
+        </Box>
     );
 };
 
