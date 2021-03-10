@@ -55,6 +55,15 @@ export const addNoteDocument = async (note: any, uid: any) => {
     }
 };
 
+export const updateNoteDocument = async (note: any, noteId: any) => {
+    const userRef = db.collection("notes").doc(noteId);
+    try {
+        await userRef.update({note});
+    } catch (error) {
+        console.log('Error in updating note: ', error);
+    }
+};
+
 export const deleteNoteDocument = async (id: any) => {
     const userRef = db.collection("notes").doc(id);
     try {

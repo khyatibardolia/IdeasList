@@ -11,8 +11,8 @@ import * as routes from "../../constants/routes";
 import {useDispatch, useSelector} from "react-redux";
 import {getAllNotesDocument, getNoteByIdDocument} from '../../service/firebase/firebase';
 import {getNoteByIdAction, getNotesAction} from '../../redux/actions/notes';
-import {CircularProgress} from "@material-ui/core";
 import AddEditNote from "./add-edit-notes/AddEditNote";
+import Spinner from "../common/spinner/Spinner";
 
 const useStyles = makeStyles({
     root: {
@@ -56,10 +56,11 @@ const Notes = () => {
     const singleNote: any = useSelector((state: any) => {
         return state?.notes?.singleNote
     });
+
     const hasNotes = singleNote && singleNote?.length;
     return (<>{loading ?
         <div className={'vh-100 d-flex justify-content-center align-items-center'}>
-            <CircularProgress color={'primary'} size={20}/></div> :
+            <Spinner/></div> :
         hasNotes ?
             <div className={'mt-0'}><AddEditNote/></div> :
             <div className={'container h-100 d-flex justify-content-center'}>

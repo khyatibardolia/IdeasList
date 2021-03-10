@@ -16,7 +16,6 @@ import {getNoteByIdAction, getNotesAction} from "../../../redux/actions/notes";
 import './Sidebar.scss';
 import {useHistory} from "react-router-dom";
 import * as routes from '../../../constants/routes';
-import { setLoader } from '../../../redux/actions/global';
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -28,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
 const Sidebar = () => {
     const dispatch = useDispatch();
     const history = useHistory();
-    const [selectedNoteId, setNoteId] = useState('');    
+    const [selectedNoteId, setNoteId] = useState('');
     const notes: any = useSelector((state: any) => {
         return state?.notes?.data
     });
@@ -38,30 +37,24 @@ const Sidebar = () => {
 
     const classes = useStyles();
     useEffect(() => {
-        const fetchData = async () => {            
-            dispatch(setLoader(true));
+        const fetchData = async () => {
             const data = await getAllNotesDocument(user?.id);
             dispatch(getNotesAction(data));
-            dispatch(setLoader(false));
             if (data && data.length) {
-                dispatch(setLoader(true));
                 const note = await getNoteByIdDocument(data && data[0]?.id);
                 dispatch(getNoteByIdAction([note]));
-                dispatch(setLoader(false));
             }
         };
         fetchData()
     }, [dispatch, user?.id]);
     const getNote = useCallback(async (id: any) => {
         if(id) {
-            dispatch(setLoader(true));
             setNoteId(id);
             const note = await getNoteByIdDocument(id);
             if(note) {
                 dispatch(getNoteByIdAction([note]));
                 history.push({pathname: `${routes.EDITNOTE}`})
             }
-            dispatch(setLoader(false));
         }
     }, [dispatch, history]);
 
@@ -90,7 +83,7 @@ const Sidebar = () => {
                 className={classes.addButton}
                 onClick={addNote}>
             Add Note
-        </Button>        
+        </Button>
     </>)
 };
 export default Sidebar;

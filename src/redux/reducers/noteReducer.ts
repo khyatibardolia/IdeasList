@@ -9,6 +9,8 @@ export const noteReducer = (state = initialState, action: any) => {
             return {...state, data: action?.payload};
         case "GET_NOTE":
             return {...state, singleNote: action?.payload};
+        case "UPDATE_NOTE":
+            return {...state, singleNote: action?.payload};
         case "DELETE_NOTE":
             return {...state, singleNote: action?.payload};
         default:

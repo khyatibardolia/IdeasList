@@ -4,14 +4,16 @@ import TreeNode from './TreeNode';
 import {Button, Box} from "@material-ui/core";
 import {connect} from 'react-redux';
 import {withRouter, RouteComponentProps} from 'react-router-dom';
+import * as routes from '../../../constants/routes';
 import {
     addNoteDocument,
     deleteNoteDocument,
-    getAllNotesDocument
+    getAllNotesDocument, updateNoteDocument
 } from "../../../service/firebase/firebase";
-import {addNoteAction, deleteNoteAction, getNotesAction} from "../../../redux/actions/notes";
+import {addNoteAction, deleteNoteAction, getNotesAction, updateNoteAction} from "../../../redux/actions/notes";
 import {toast} from 'react-toastify';
 import Spinner from '../../common/spinner/Spinner';
+import {setLoader} from "../../../redux/actions/global";
 
 interface IMapStateToProps {
     singleNote?: any,
@@ -24,6 +26,8 @@ interface IMapDispatchToProps {
     addNoteAction?: (data: any) => [];
     getNotesAction?: (data: any) => [];
     deleteNoteAction?: (id: any) => [];
+    updateNoteAction?: (data: any) => [];
+    setLoader?: (data: any) => [];
 }
 
 interface IState {
@@ -41,26 +45,33 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
         this.state = {
             nodes: [],
             singleNote: [{id: null, note: []}],
-            addRootNode: false
+            addRootNode: false,
+            isEditMode: false
         };
     }
 
 
-    componentDidMount() {               
-        if (this.props.history?.location?.pathname === '/note/add') {
-            this.setState({ addRootNode: true }, () => this.addRootElement());
+    componentDidMount() {
+        if (this.props.history?.location?.pathname.includes('/add')) {
+            this.setState({addRootNode: true}, () => this.addRootElement());
         }
     }
 
-    componentDidUpdate () {                        
-        if (this.props.history?.location?.pathname === '/note/edit' && (this.state.singleNote||[]).length && (this.props.singleNote||[]).length && 
-        this.state.singleNote[0].id !== this.props.singleNote[0].id) {            
-            const allNodes = this.initializedNodes(this.props.singleNote[0].note);
-            this.setState({ nodes: allNodes, singleNote: [{...this.props.singleNote[0], note: allNodes}] })
+    static getDerivedStateFromProps(nextProps: any, prevState: any) : any {
+        if(nextProps.history?.location?.pathname.includes('/add') &&
+            nextProps.singleNote !== prevState.singleNote) {
+            return { singleNote: nextProps.singleNote };
         }
-
-        
-    }  
+        return null;
+    }
+    componentDidUpdate() {
+        if (this.props.history?.location?.pathname.includes('/edit') &&
+            (this.state.singleNote || []).length && (this.props.singleNote || []).length &&
+            this.state.singleNote[0].id !== this.props.singleNote[0].id) {
+            const allNodes = this.initializedNodes(this.props.singleNote[0].note);
+            this.setState({nodes: allNodes, singleNote: [{...this.props.singleNote[0], note: allNodes}]})
+        }
+    }
 
     initializedNodes = (nodes: any, location?: any): any => {
         const nodesCopy = [];
@@ -98,10 +109,11 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
 
             this.setState({nodes: allNodes});
         };
-    }
+    };
 
     addRootElement = () => {
         const {nodes}: any = this.state;
+        const {history}: any = this.props;
         const id = nodes.length ? `${nodes.length + 1}` : '1';
         const newNode = {
             children: [],
@@ -111,9 +123,9 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
             id,
             title: '',
         };
-
+        history.push(routes.ADDNOTE);
         this.setState({nodes: [newNode]});
-    }
+    };
 
     addChild = (id: any) => {
         return () => {
@@ -188,7 +200,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
             const {id, title, children} = nodes[i];
             const hasChildren = children !== undefined && children.length > 0;
             nodesCopy[i] = {
-                id,                
+                id,
                 level: i,
                 title,
                 children: hasChildren ? this.simplify(children) : [],
@@ -197,37 +209,53 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
         return [...nodesCopy];
     };
 
-    saveNodes = async () => {
-        const {nodes} = this.state;
-        const {user} = this.props;
-        const nodesCopy = this.simplify(nodes)
-        const data = await addNoteDocument(nodesCopy, user?.id);
-        this.props.addNoteAction(data);
+    saveNodes = async (isEditMode: boolean) => {
+        const {nodes, singleNote} = this.state;
+        const {user, addNoteAction, updateNoteAction, history, setLoader} = this.props;
+        const nodesCopy = this.simplify(nodes);
+        setLoader(true);
+        if (!isEditMode) {
+            const data = await addNoteDocument(nodesCopy, user?.id);
+            addNoteAction(data);
+            this.setState({nodes: singleNote[0]?.note});
+            setLoader(false);
+            history.push(routes.EDITNOTE);
+        } else {
+            const data = await updateNoteDocument(nodesCopy, singleNote[0]?.id)
+            updateNoteAction(data);
+            setLoader(false);
+        }
+        this.getAllNotes();
+        toast.success(`Note ${isEditMode ? 'updated' : 'saved'} successfully!`)
+    };
+
+    getAllNotes = async () => {
+        const {user, getNotesAction} = this.props;
         const allNotes = await getAllNotesDocument(user?.id);
-        this.props.getNotesAction(allNotes);
-        toast.success('Note saved successfully!')
+        getNotesAction(allNotes);
     };
 
     deleteNode = async (id: any) => {
-        const {user} = this.props;
+        const {deleteNoteAction} = this.props;
+        console.log('id', id)
         if (id) {
             const data = await deleteNoteDocument(id);
-            this.props.deleteNoteAction(data);
-            const data1 = await getAllNotesDocument(user?.id);
-            this.props.getNotesAction(data1);
-        } else {
+            deleteNoteAction(data);
             this.setState({nodes: []})
         }
+        this.getAllNotes();
         toast.success('Note deleted successfully!')
     };
 
     render() {
-        const {nodes, singleNote }: any = this.state;                
+        const {nodes, singleNote }: any = this.state;
+        const {loader, history }: any = this.props;
+        const isEditMode = history?.location?.pathname.includes('/edit');
         return (
             <div className={'mt-6'}>{nodes?.length ? <Box m={3} display={'flex'} justifyContent={'flex-end'}>
                 <Button className={'mr-2'} variant="outlined" color="primary"
-                        onClick={() => this.saveNodes()}>
-                    Save
+                        onClick={() => this.saveNodes(isEditMode)}>
+                    {`${isEditMode ? 'Update' : 'Save'}`}
                 </Button>
                 <Button variant="outlined" color="secondary"
                         onClick={() => this.deleteNode(singleNote && singleNote[0]?.id)}>
@@ -250,7 +278,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
                         })}
                     </ul>
                 </div>
-                {this.props.loader && <Spinner />}
+                {loader ? <Spinner /> : null}
             </div>
         );
     }
@@ -266,6 +294,8 @@ const mapDispatchToProps = (dispatch: any): any => ({
     addNoteAction: (values: any) => dispatch(addNoteAction(values)),
     deleteNoteAction: (id: any) => dispatch(deleteNoteAction(id)),
     getNotesAction: (values: any) => dispatch(getNotesAction(values)),
+    updateNoteAction: (values: any) => dispatch(updateNoteAction(values)),
+    setLoader: (loading: any) => dispatch(setLoader(loading)),
 });
 
 export default withRouter(connect(

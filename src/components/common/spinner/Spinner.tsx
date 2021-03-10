@@ -21,9 +21,7 @@ export default function Spinner() {
     <div className={'spinner-loading-div'}>
       <div className={'spinner-loading'}>
         <div className={classes.root}>
-          <CircularProgress />
           <CircularProgress color="secondary" />
-          <CircularProgress color="inherit" />
         </div>
       </div>
     </div>

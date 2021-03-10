@@ -38,7 +38,6 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
     const [loading, setLoading] = React.useState(false);
     const [cookies, setCookie] = useCookies(['user']);
 
-    console.log('cookies', cookies);
     const useStyles = makeStyles((theme) => ({
         root: {
             height: '100vh',
