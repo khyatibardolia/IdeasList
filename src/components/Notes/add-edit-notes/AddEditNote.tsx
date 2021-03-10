@@ -39,28 +39,27 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
         super(props);
         this.state = {
             nodes: [],
-            singleNote: [],
+            singleNote: [{id: null, note: []}],
             addRootNode: false
         };
     }
 
 
-    componentDidMount() {
-        //const {singleNote} = this.props;
+    componentDidMount() {        
         if (this.props.history?.location?.pathname === '/note/add') {
             this.setState({ addRootNode: true }, () => this.addRootElement());
-        } /*else {
-            this.initializedNodes(singleNote[0]?.note)
-            this.setState({singleNote: singleNote[0]?.note})
-        }*/
+        }
     }
 
-    static getDerivedStateFromProps(nextProps: any, prevState: any) : any {
-        if(nextProps.singleNote !== prevState.singleNote) {
-            return { singleNote: nextProps.singleNote };
+    componentDidUpdate () {                
+        if (this.props.history?.location?.pathname === '/note/edit' && (this.state.singleNote||[]).length && (this.props.singleNote||[]).length && 
+        this.state.singleNote[0].id !== this.props.singleNote[0].id) {            
+            const allNodes = this.initializedNodes(this.props.singleNote[0].note);
+            this.setState({ nodes: allNodes, singleNote: [{...this.props.singleNote[0], note: allNodes}] })
         }
-        return null;
-    }
+
+        
+    }  
 
     initializedNodes = (nodes: any, location?: any): any => {
         const nodesCopy = [];
@@ -185,10 +184,10 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
     simplify = (nodes: any): any => {
         const nodesCopy = [];
         for (let i = 0; i < nodes.length; i++) {
-            const {children, title} = nodes[i];
+            const {id, title, children} = nodes[i];
             const hasChildren = children !== undefined && children.length > 0;
             nodesCopy[i] = {
-                id: `id${i}` + (new Date()).getTime(),
+                id,                
                 level: i,
                 title,
                 children: hasChildren ? this.simplify(children) : [],
@@ -222,11 +221,9 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
     };
 
     render() {
-        const {nodes, singleNote, addRootNode}: any = this.state;
-        //  const a = this.initializedNodes(singleNote[0]?.note);
-        const data = !addRootNode && singleNote && Object.keys(singleNote).length ? singleNote[0]?.note : nodes
+        const {nodes, singleNote }: any = this.state;                
         return (
-            <div className={'mt-6'}>{data?.length ? <Box m={3} display={'flex'} justifyContent={'flex-end'}>
+            <div className={'mt-6'}>{nodes?.length ? <Box m={3} display={'flex'} justifyContent={'flex-end'}>
                 <Button className={'mr-2'} variant="outlined" color="primary"
                         onClick={() => this.saveNodes()}>
                     Save
@@ -243,7 +240,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
                 </Button></div>}
                 <div className={'container h-100 d-flex justify-content-center'}>
                     <ul className="Nodes d-flex justify-content-center align-items-center flex-column">
-                        {data?.map((nodeProps: any, index: any) => {
+                        {nodes?.map((nodeProps: any, index: any) => {
                             const {id, ...others} = nodeProps;
                             return <TreeNode addNew={true}
                                              key={`${id}of${index}`}
