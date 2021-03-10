@@ -46,7 +46,7 @@ const Notes = () => {
             dispatch(getNotesAction(data));
             if (data && data.length) {
                 const note = await getNoteByIdDocument(data && data[0]?.id);
-                dispatch(getNoteByIdAction([note]));
+                dispatch(getNoteByIdAction(note));
             }
             setLoader(false);
         };
@@ -57,7 +57,7 @@ const Notes = () => {
         return state?.notes?.singleNote
     });
 
-    const hasNotes = singleNote && singleNote?.length;
+    const hasNotes = singleNote && Object.keys(singleNote)?.length;
     return (<>{loading ?
         <div className={'vh-100 d-flex justify-content-center align-items-center'}>
             <Spinner/></div> :

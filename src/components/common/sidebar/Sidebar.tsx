@@ -42,7 +42,7 @@ const Sidebar = () => {
             dispatch(getNotesAction(data));
             if (data && data.length) {
                 const note = await getNoteByIdDocument(data && data[0]?.id);
-                dispatch(getNoteByIdAction([note]));
+                dispatch(getNoteByIdAction(note));
             }
         };
         fetchData()
@@ -52,7 +52,7 @@ const Sidebar = () => {
             setNoteId(id);
             const note = await getNoteByIdDocument(id);
             if(note) {
-                dispatch(getNoteByIdAction([note]));
+                dispatch(getNoteByIdAction(note));
                 history.push({pathname: `${routes.EDITNOTE}`})
             }
         }

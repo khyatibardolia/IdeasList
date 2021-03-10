@@ -19,7 +19,7 @@ import {logOut} from "../../../service/firebase/auth";
 import {userAuthenticationAction} from "../../../redux/actions/authenticate";
 import {useDispatch, useSelector} from "react-redux";
 import { withCookies } from 'react-cookie';
-import {getNoteByIdAction} from "../../../redux/actions/notes";
+import {getNoteByIdAction, getNotesAction} from "../../../redux/actions/notes";
 
 const drawerWidth = 240;
 
@@ -117,7 +117,8 @@ const Header = (props: any) => {
     const handleLogOut = async () => {
         await logOut();
         dispatch(userAuthenticationAction({}));
-        dispatch(getNoteByIdAction([]));
+        dispatch(getNoteByIdAction({}));
+        dispatch(getNotesAction([]));
         cookies.remove('user', { path: '/' });
     };
 

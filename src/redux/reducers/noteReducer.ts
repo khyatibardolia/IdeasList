@@ -1,6 +1,6 @@
 const initialState = {
     data: {},
-    singleNote: []
+    singleNote: {}
 };
 
 export const noteReducer = (state = initialState, action: any) => {

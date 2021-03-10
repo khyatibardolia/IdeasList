@@ -44,7 +44,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
         super(props);
         this.state = {
             nodes: [],
-            singleNote: [{id: null, note: []}],
+            singleNote: {id: '', note: []},
             addRootNode: false,
             isEditMode: false
         };
@@ -57,39 +57,34 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
         }
     }
 
-    static getDerivedStateFromProps(nextProps: any, prevState: any) : any {
-        if(nextProps.history?.location?.pathname.includes('/add') &&
-            nextProps.singleNote !== prevState.singleNote) {
-            return { singleNote: nextProps.singleNote };
-        }
-        return null;
-    }
     componentDidUpdate() {
         if (this.props.history?.location?.pathname.includes('/edit') &&
-            (this.state.singleNote || []).length && (this.props.singleNote || []).length &&
-            this.state.singleNote[0].id !== this.props.singleNote[0].id) {
-            const allNodes = this.initializedNodes(this.props.singleNote[0].note);
-            this.setState({nodes: allNodes, singleNote: [{...this.props.singleNote[0], note: allNodes}]})
+            (this.state?.singleNote?.note) !== (this.props?.singleNote?.note) &&
+            this.state?.singleNote?.id !== this.props?.singleNote?.id) {
+            const allNodes = this.initializedNodes(this.props.singleNote?.note);
+            this.setState({nodes: allNodes, singleNote: {...this.props.singleNote, note: allNodes}})
         }
     }
 
     initializedNodes = (nodes: any, location?: any): any => {
         const nodesCopy = [];
-        for (let i = 0; i < nodes.length; i++) {
-            const {children, title} = nodes[i];
-            const hasChildren = children !== undefined;
-            const id = location ? `${location}.${i + 1}` : `${i + 1}`;
-            nodesCopy[i] = {
-                children: hasChildren ? this.initializedNodes(children, id) : [],
-                changeTitle: this.changeTitle(id),
-                removeNode: this.removeNode(id),
-                addChild: this.addChild(id),
-                id,
-                level: i,
-                title,
-            };
+        if(nodes && nodes.length) {
+            for (let i = 0; i < nodes.length; i++) {
+                const {children, title} = nodes[i];
+                const hasChildren = children !== undefined;
+                const id = location ? `${location}.${i + 1}` : `${i + 1}`;
+                nodesCopy[i] = {
+                    children: hasChildren ? this.initializedNodes(children, id) : [],
+                    changeTitle: this.changeTitle(id),
+                    removeNode: this.removeNode(id),
+                    addChild: this.addChild(id),
+                    id,
+                    level: i,
+                    title,
+                };
+            }
+            return nodesCopy;
         }
-        return nodesCopy;
     };
 
     changeTitle = (id: any) => {
@@ -124,7 +119,7 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
             title: '',
         };
         history.push(routes.ADDNOTE);
-        this.setState({nodes: [newNode]});
+        this.setState({nodes: [newNode], singleNote: []});
     };
 
     addChild = (id: any) => {
@@ -215,18 +210,25 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
         const nodesCopy = this.simplify(nodes);
         setLoader(true);
         if (!isEditMode) {
-            const data = await addNoteDocument(nodesCopy, user?.id);
-            addNoteAction(data);
-            this.setState({nodes: singleNote[0]?.note});
-            setLoader(false);
-            history.push(routes.EDITNOTE);
+            if(nodes && nodes[0]?.title !== "") {
+                const data = await addNoteDocument(nodesCopy, user?.id);
+                addNoteAction(data);
+                this.setState({nodes: singleNote?.note});
+                setLoader(false);
+                history.push(routes.EDITNOTE);
+                toast.success(`Note saved successfully!`)
+                this.getAllNotes();
+            } else {
+                setLoader(false);
+                toast.error('Please enter a title to save your note.')
+            }
         } else {
-            const data = await updateNoteDocument(nodesCopy, singleNote[0]?.id)
+            const data = await updateNoteDocument(nodesCopy, singleNote?.id)
             updateNoteAction(data);
             setLoader(false);
+            toast.success(`Note updated successfully!`)
+            this.getAllNotes();
         }
-        this.getAllNotes();
-        toast.success(`Note ${isEditMode ? 'updated' : 'saved'} successfully!`)
     };
 
     getAllNotes = async () => {
@@ -237,30 +239,30 @@ class AddEditNote extends Component<AppProps | any, IState | any> {
 
     deleteNode = async (id: any) => {
         const {deleteNoteAction} = this.props;
-        console.log('id', id)
         if (id) {
             const data = await deleteNoteDocument(id);
             deleteNoteAction(data);
-            this.setState({nodes: []})
+            this.setState({nodes: []});
+            this.getAllNotes();
+            toast.success('Note deleted successfully!')
         }
-        this.getAllNotes();
-        toast.success('Note deleted successfully!')
     };
 
     render() {
         const {nodes, singleNote }: any = this.state;
         const {loader, history }: any = this.props;
         const isEditMode = history?.location?.pathname.includes('/edit');
+        console.log('nodes', nodes)
         return (
             <div className={'mt-6'}>{nodes?.length ? <Box m={3} display={'flex'} justifyContent={'flex-end'}>
                 <Button className={'mr-2'} variant="outlined" color="primary"
                         onClick={() => this.saveNodes(isEditMode)}>
                     {`${isEditMode ? 'Update' : 'Save'}`}
                 </Button>
-                <Button variant="outlined" color="secondary"
-                        onClick={() => this.deleteNode(singleNote && singleNote[0]?.id)}>
+                {singleNote && singleNote?.id ? <Button variant="outlined" color="secondary"
+                        onClick={() => this.deleteNode(singleNote && singleNote?.id)}>
                     Delete
-                </Button>
+                </Button> : null}
             </Box> : <div
                 className={'w-100 d-flex justify-content-center align-items-center'}>
                 <Button variant="outlined" color="primary"
