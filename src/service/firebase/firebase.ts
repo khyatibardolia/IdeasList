@@ -32,7 +32,8 @@ export const getAllNotesDocument = async (id: any) => {
         const id = doc.id;
         return {id, ...data};
     });
-    const filter = allNotes && allNotes.length && allNotes?.filter((item: any) => item.userId === id);
+    const filter = allNotes && allNotes.length &&
+        allNotes?.filter((item: any) => item.userId === id);
     return filter;
 };
 

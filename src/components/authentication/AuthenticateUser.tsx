@@ -81,7 +81,7 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
             <Typography variant="body2" color="textSecondary" align="center">
                 {'Copyright © '}
                 <Link color="inherit" href="https://material-ui.com/">
-                    Moar
+                    IdeasList
                 </Link>{' '}
                 {new Date().getFullYear()}
                 {'.'}
@@ -100,7 +100,7 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                 if(token) {
                     dispatch(userAuthenticationAction({data, token}));
                     setLoading(false);
-                    toast.success(`Welcome to Moar! ${displayName}`);
+                    toast.success(`Welcome to Ideas List! ${displayName}`);
                     setCookie('user', {data, token}, { path: '/' });
                     history.push(routes.NOTES);
                 }
@@ -147,7 +147,7 @@ const AuthenticateUser: React.FC<IFormInputs & InjectedFormProps<{}, IFormInputs
                   component={Paper} elevation={6} square>
                 <div className={`${classes.paper} form-grid`}>
                     <Typography className={'mb-3'} component="h1" variant="h4">
-                        Welcome to Moar
+                        Welcome to Ideas List
                     </Typography>
                     <Typography className={'mb-3'} color={'secondary'} component="h6" variant="h6">
                         Organize your ideas, and make them real!

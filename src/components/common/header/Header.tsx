@@ -146,7 +146,7 @@ const Header = (props: any) => {
                         <MenuIcon/>
                     </IconButton>
                     <Typography variant="h6" noWrap>
-                        Moar
+                        Ideas List
                     </Typography>
                     <div>
                         <IconButton
